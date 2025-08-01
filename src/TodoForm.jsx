@@ -6,7 +6,6 @@ function TodoForm({onAddTodo}) {
     
     function handleAddTodo(event){
         event.preventDefault();
-    //    console.dir(event.target.title);
         const title = event.target.title.value;
         onAddTodo(title);
         event.target.title.value = "";
