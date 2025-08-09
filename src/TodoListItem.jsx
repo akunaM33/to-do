@@ -1,11 +1,17 @@
 
 
-function TodoListItem (props) {
+function TodoListItem(props) {
 
     return (
-        
-            <li key={props.id}>{props.title}</li>
-        
+        <li>
+            <form name="todos">
+                <input type="checkbox"
+                    checked={props.completed}
+                    onChange={() => props.onCompleteTodo(props.id)}
+                />
+                {props.title}
+            </form>
+        </li>
     )
 }
 
