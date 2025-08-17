@@ -1,6 +1,6 @@
 import TodoListItem from './TodoListItem';
 
-function TodoList({ list, onCompleteTodo }) {
+function TodoList({ list, onCompleteTodo, onUpdateTodo }) {
 
   const filteredTodoList = list.filter((todo) => todo.isCompleted === false);
   
@@ -9,10 +9,12 @@ function TodoList({ list, onCompleteTodo }) {
       {filteredTodoList.length > 0 ? (
         filteredTodoList.map((todo) => <TodoListItem
           key={todo.id}
-          id={todo.id}
-          title={todo.title}
-          completed={todo.isCompleted}
+          // id={todo.id}
+          // title={todo.title}
+          // completed={todo.isCompleted}
+          todo={todo}
           onCompleteTodo={onCompleteTodo}
+          onUpdateTodo={onUpdateTodo}
         />
         )) : (
         <p>Add Todo above to get started</p>
