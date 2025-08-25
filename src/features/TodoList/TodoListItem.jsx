@@ -23,7 +23,7 @@ function TodoListItem({todo, onCompleteTodo, onUpdateTodo}) {
     return (
 
         <li>
-            <form name="todos" >
+            <form name="todos" onSubmit={handleUpdate}>
 
                 {isEditing ? (
                     <>
