@@ -1,19 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
+import styles from './App.module.css';
 import TodoList from './features/TodoList/TodoList';
 import TodoForm from './features/TodoForm';
 import TodosViewForm from './features/TodosViewForm';
 
 const url = `https://api.airtable.com/v0/${import.meta.env.VITE_BASE_ID}/${import.meta.env.VITE_TABLE_NAME}`;
 const token = `Bearer ${import.meta.env.VITE_PAT}`;
-
-// function encodeUrl({ queryString, sortField, sortDirection }) {
-//   let searchQuery = '';
-//   if (queryString) {
-//     searchQuery = `&filterByFormula=SEARCH("${queryString}", +title)`
-//   }
-//   let sortQuery = `sort[0][field]=${sortField}&sort[0][direction]=${sortDirection}`;
-//   return encodeURI(`${url}?${sortQuery}${searchQuery}`);
-// }
 
 function App() {
 
@@ -208,7 +200,7 @@ function App() {
   }
 
   return (
-    <div>
+    <div className={styles.app}>
       <h1>Todo List</h1>
       <TodoForm onAddTodo={addTodo} isSaving={isSaving} />
 
@@ -226,7 +218,7 @@ function App() {
         setQueryString={setQueryString} />
 
       {errorMessage &&
-        <div><hr /><p>{errorMessage}</p>
+        <div className={styles.err}><hr /><p>{errorMessage}</p>
           <button onClick={() => setErrorMessage('')}>Dismiss</button>
         </div>
       }
