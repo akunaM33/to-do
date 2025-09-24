@@ -26,25 +26,84 @@ const actions = {
 
 function reducer(state = initialState, action) {
     switch (action.type) {
-        case actions.fetchTodos: return { ...state };
-        case actions.loadTodos: return { ...state };
-        case actions.setLoadError: return { ...state, errorMessage: 'failed to load todo' };
-        case actions.startRequest: return { ...state, errorMessage: '', isLoading: true };
+        case actions.fetchTodos: return { ...state, isLoading: true };
+
+        case actions.loadTodos: {
+            const fetchedRecords = action.records.map((record) => {
+                const todo = {
+                    id: record.id,
+                    ...record.fields,
+                };
+
+                if (!todo.isCompleted) {
+                    todo.isCompleted = false;
+                }
+                return todo;
+            });                                             
+            
+            return { ...state, todoList: fetchedRecords, isLoading: false };
+        };
+
+        case actions.setLoadError: return { ...state, errorMessage: action.error.message, isLoading: false };
+        ////////////////////////////// Pessimistic UI: /////////////////////////////////////
+        case actions.startRequest: return { ...state, isSaving: true };
+
         case actions.addTodo: {
             const savedTodo = {
-                id: records[0].id,
-                ...records[0].fields,
+                id: action.payload.id,
+                title: action.payload.fields.title,
+                isCompleted: false
             }
-            if (!records[0].fields.isCompleted) { savedTodo.isCompleted = false; }
-        //    setTodoList([...todoList, savedTodo]);
-            return { ...state, savedTodo }
+            if (!action.isCompleted) { savedTodo.isCompleted = false; }
+                                           
+            return { ...state, todoList: [...state.todoList, savedTodo], isSaving: false }
         };
-        case actions.endRequest: return { ...state, isLoading: false };
-        case actions.updateTodo: return {...state, };
-        case actions.completeTodo: return {...state, };
-        case actions.revertTodo: return {...state, };
-        case actions.clearError: return {...state, errorMessage: '', };
+
+        case actions.endRequest: return { ...state, isLoading: false, isSaving: false };
+        ////////////////////////////// Optimistic UI: /////////////////////////////////////
+        case actions.revertTodo: {
+            const revertedTodos = todoList.map((t) => {
+                if (t.id === action.id) {}
+            });
+        };  //Fall-through logic
+
+        case actions.updateTodo: {
+            const patchedTodo = {
+                id: action.payload.id,
+                ...action.payload.fields,
+            };
+            if (!action.isCompleted) { patchedTodo.isCompleted = false; }
+
+            const updatedState = {
+                ...state,
+                todoList: state.todoList.map((item) => item.id === patchedTodo.id ? (
+                    { ...item, ...patchedTodo }) : (item)
+                )
+            };
+            return updatedState;
+        };
+
+        case actions.completeTodo: {
+            const updatedTodos = state.todoList.map((t) => {
+                if (t.id === action.id) {
+                    return { ...t, isCompleted: true };
+                } else {
+                    return t;
+                }
+            });                                       //  console.log("On Complete: ", updatedTodos);
+            return { ...state, todoList: [...updatedTodos] };
+        };
+
+        case actions.revertTodo: {
+            const originalTodo = state.todoList.find((todo) => todo.id === action.id);
+            const revertedTodos = state.todoList.map((t) => {
+                if (t.id === action.id) { return originalTodo; }
+                else { return t; }
+            });
+            return { ...state, ...revertedTodos};
+        }
+        case actions.clearError: return { ...state, errorMessage: '', };
     }
 }
 
-export { initialState, actions };
+export { initialState, actions, reducer };
