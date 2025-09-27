@@ -2,7 +2,7 @@ import { useState } from 'react';
 import TextInputWithLabel from '../../shared/TextInputWithLabel';
 import './TodoListItem.module.css';
 
-function TodoListItem({todo, onCompleteTodo, onUpdateTodo}) {
+function TodoListItem({todo, onCompleteTodo, onUpdateTodo,isChecked}) {
 
     const [isEditing, setIsEditing] = useState(false);
     const [workingTitle, setWorkingTitle] = useState(todo.title);
@@ -15,7 +15,7 @@ function TodoListItem({todo, onCompleteTodo, onUpdateTodo}) {
         setWorkingTitle(event.target.value);
     }
     function handleUpdate(event) {
-        if (!isEditing){return;}
+        if (!isEditing || workingTitle.length == 0){return;}
     //    event.prevent.default();
         onUpdateTodo({...todo, title: workingTitle});
         setIsEditing(false);
@@ -36,7 +36,7 @@ function TodoListItem({todo, onCompleteTodo, onUpdateTodo}) {
                     <>
                         <label>
                             <input type="checkbox"
-                                checked={todo.completed}
+                                checked={isChecked}
                                 onChange={() => onCompleteTodo(todo.id)}
                             />
                         </label>
