@@ -3,6 +3,7 @@ const initialState = {
     isLoading: false,
     isSaving: false,
     errorMessage: '',
+    isCompleted: false
 };
 
 const actions = {
@@ -82,15 +83,15 @@ function reducer(state = initialState, action) {
             };
             return updatedState;
         };
-
+        
         case actions.completeTodo: {
             const updatedTodos = state.todoList.map((t) => {
-                if (t.id === action.id) {
-                    return { ...t, isCompleted: true };
+                if (t.id === action.payload) {
+                    return { ...t, isCompleted: !t.isCompleted };
                 } else {
                     return t;
                 }
-            });                                       //  console.log("On Complete: ", updatedTodos);
+            });                                         console.log("On Complete: ", updatedTodos);
             return { ...state, todoList: [...updatedTodos] };
         };
 

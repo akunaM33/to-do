@@ -123,7 +123,7 @@ function App() {
     }
   }
    ////////////////////// TODO is Completed:  ////////////////////////////////
-  const completeTodo = async (id) => {
+  const completeTodo = (id) => {
 
     dispatch({type: todoActions.completeTodo, payload: id});
     
@@ -137,7 +137,8 @@ function App() {
       <TodoList list={todoState.todoList}
         onCompleteTodo={completeTodo}
         onUpdateTodo={updateTodo}
-        isLoading={todoState.isLoading} />
+        isLoading={todoState.isLoading} 
+        isChecked={todoState.isCompleted} dispatch={dispatch} />
       <hr />
       <TodosViewForm
         sortField={sortField}

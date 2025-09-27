@@ -1,7 +1,7 @@
 import TodoListItem from './TodoListItem';
 import styles from './TodoList.module.css';
 
-function TodoList({ list, onCompleteTodo, onUpdateTodo, isLoading }) {
+function TodoList({ list, onCompleteTodo, onUpdateTodo, isLoading,isChecked }) {
 
   const filteredTodoList = list.filter((todo) => todo.isCompleted === false);
   
@@ -16,6 +16,7 @@ function TodoList({ list, onCompleteTodo, onUpdateTodo, isLoading }) {
                 todo={todo}
                 onCompleteTodo={onCompleteTodo}
                 onUpdateTodo={onUpdateTodo}
+                isChecked={isChecked} 
               />
               )) : (
               <p>Add Todo above to get started</p>
