@@ -16,13 +16,11 @@ function TodoListItem({todo, onCompleteTodo, onUpdateTodo,isChecked}) {
     }
     function handleUpdate(event) {
         if (!isEditing || workingTitle.length == 0){return;}
-    //    event.prevent.default();
-        onUpdateTodo({...todo, title: workingTitle});
-        setIsEditing(false);
+            onUpdateTodo({...todo, title: workingTitle});
+            setIsEditing(false);
     }
 
     return (
-
         <li>
             <form name="todos" onSubmit={handleUpdate}>
 

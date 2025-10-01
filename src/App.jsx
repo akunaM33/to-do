@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useReducer, useState } from 'react';
+import { Routes, Route, useLocation } from 'react-router';
 import styles from './App.module.css';
-import TodoList from './features/TodoList/TodoList';
-import TodoForm from './features/TodoForm';
-import TodosViewForm from './features/TodosViewForm';
+import TodosPage from './pages/TodosPage';
+import Header from './shared/Header';
+import About from './pages/About';
+import NotFound from './pages/NotFound';
+
 import {
   reducer as todosReducer,
   actions as todoActions,
@@ -15,7 +18,6 @@ const token = `Bearer ${import.meta.env.VITE_PAT}`;
 function App() {
   const [todoState, dispatch] = useReducer(todosReducer, initialTodosState);
 
-  const [todoList, setTodoList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -34,8 +36,7 @@ function App() {
 
   useEffect(() => {
     const fetchTodos = async () => {
-      //setIsLoading(true);
-      dispatch({type: todoActions.fetchTodos})
+      dispatch({ type: todoActions.fetchTodos })
       const options = {
         method: 'GET',
         headers: {
@@ -48,10 +49,10 @@ function App() {
           throw new Error(resp.message);
         }
         const res = await resp.json();
-                                                                      // console.log("Fetch Records: ", res.records);
-        dispatch({type: todoActions.loadTodos, records: res.records})
+                                                                            // console.log("Fetch Records: ", res.records);
+        dispatch({ type: todoActions.loadTodos, records: res.records })
       } catch (error) {
-        dispatch({type: todoActions.setLoadError});
+        dispatch({ type: todoActions.setLoadError });
       } finally {
         setIsLoading(false);
       }
@@ -77,22 +78,22 @@ function App() {
       body: JSON.stringify(payload),
     };
     try {
-      dispatch({type: todoActions.startRequest});
+      dispatch({ type: todoActions.startRequest });
       const resp = await fetch(encodeUrl(), options);
       if (!resp.ok) {
         throw new Error(resp.message);
       }
-      const res = await resp.json();           
-      dispatch({type: todoActions.addTodo, payload: res.records[0]});
+      const res = await resp.json();
+      dispatch({ type: todoActions.addTodo, payload: res.records[0] });
     } catch (error) {
-      dispatch({type: todoActions.setLoadError});
+      dispatch({ type: todoActions.setLoadError });
     } finally {
-      dispatch({type: todoActions.endRequest});
+      dispatch({ type: todoActions.endRequest });
     }
   }
-   ///////////////////////// UPDATE TODO: //////////////////////////////////
+  //////////////////////////// UPDATE TODO: //////////////////////////////////
   const updateTodo = async (editedTodo) => {
-    const originalTodo = todoList.find((todo) => todo.id === editedTodo.id);
+    const originalTodo = todoState.todoList.find((todo) => todo.id === editedTodo.id);
     const payload = {
       records: [{
         id: editedTodo.id,
@@ -111,46 +112,50 @@ function App() {
       const resp = await fetch(encodeUrl(), options);
       if (!resp.ok) { throw Error(resp.message) }
       const res = await resp.json();
-      
-      dispatch({type: todoActions.updateTodo, payload: res.records[0]});
+
+      dispatch({ type: todoActions.updateTodo, payload: res.records[0] });
     } catch (error) {
       console.log(error);
       setErrorMessage(`${error.message}. Reverting todo...`);
-      
-      dispatch({type: actions.revertTodo, payload: id})
+
+      dispatch({ type: actions.revertTodo, payload: id })
     } finally {
       setIsSaving(false);
     }
   }
-   ////////////////////// TODO is Completed:  ////////////////////////////////
+  //////////////////////////// TODO is Completed:  ////////////////////////////////
   const completeTodo = (id) => {
+    dispatch({ type: todoActions.completeTodo, payload: id });
+  }
+  //////////////////////////// ROUTING  ////////////////////////////////
+  const location = useLocation();
+  const [title, setTitle] = useState('');
+  const showHeader = ['/', '/about'].includes(location.pathname);
+  
+  useEffect(() => {
+    if (location.pathname === '/') { setTitle('Todo List') }
+    else if (location.pathname === "/about") { setTitle('About') }
+    else { setTitle('') }
+  }, [location]);
 
-    dispatch({type: todoActions.completeTodo, payload: id});
-    
+  const props = {
+    todoState, dispatch,
+    addTodo, completeTodo, updateTodo,
+    sortField, setSortField, sortDirection, setSortDirection, queryString, setQueryString
   }
 
   return (
     <div className={styles.app}>
-      <h1>Todo List</h1>
-      <TodoForm onAddTodo={addTodo} isSaving={todoState.isSaving} />
-
-      <TodoList list={todoState.todoList}
-        onCompleteTodo={completeTodo}
-        onUpdateTodo={updateTodo}
-        isLoading={todoState.isLoading} 
-        isChecked={todoState.isCompleted} dispatch={dispatch} />
-      <hr />
-      <TodosViewForm
-        sortField={sortField}
-        setSortField={setSortField}
-        sortDirection={sortDirection}
-        setSortDirection={setSortDirection}
-        queryString={queryString}
-        setQueryString={setQueryString} />
+      {showHeader && <Header title={title} />}
+      <Routes>
+        <Route path='/' element={<TodosPage {...props} />} />
+        <Route path='/about' element={<About />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
 
       {errorMessage &&
         <div className={styles.err}><hr /><p>{errorMessage}</p>
-          <button onClick={dispatch({type: actions.clearError})}>Dismiss</button>
+          <button onClick={dispatch({ type: actions.clearError })}>Dismiss</button>
         </div>
       }
     </div>
