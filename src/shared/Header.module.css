@@ -1,0 +1,22 @@
+.header {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    width: 100%;
+}
+
+h1 {
+  margin-top: 0;
+}
+
+nav {
+    align-self: flex-end;
+    padding: 10px 10px 0px;
+}
+
+a {
+    padding-right: 15px;
+}
+.active{
+    color: rgb(22, 15, 234);
+}
